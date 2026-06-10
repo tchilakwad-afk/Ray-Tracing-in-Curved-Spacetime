@@ -4,7 +4,7 @@ int main()
 {
 	sf::RenderWindow window( sf::VideoMode( { 800, 600 } ), "Hello world!" );
 	sf::CircleShape shape( 100.f );
-	shape.setFillColor( sf::Color::Green );
+	shape.setFillColor( sf::Color::Blue );
 
 	while ( window.isOpen() )
 	{
