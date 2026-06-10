@@ -18,26 +18,22 @@ int main()
 	// 	window.draw( shape );
 	// 	window.display();
 	// }
-	sf ::RenderWindow window( sf::VideoMode( { 800, 600 } ), "My window" );
-	sf ::RenderTexture renderTexture({500, 500});
-	sf ::CircleShape shape(100.f);
-	shape.setFillColor(sf::Color::Magenta);
+	sf ::RenderWindow window(sf::VideoMode({800, 600}), "Window");
+	sf ::RectangleShape rectangle({120.f, 50.f});
+	rectangle.setFillColor(sf::Color::Cyan);
+	rectangle.setOutlineThickness(-12.f);
+	rectangle.setOutlineColor(sf::Color::Magenta);
 
-	renderTexture.clear();
-	renderTexture.draw(shape);
-	renderTexture.display();
+	while(window.isOpen())
+	{
+		while ( const std::optional event = window.pollEvent() )
+	 	{
+	 		if ( event->is<sf::Event::Closed>() )
+	 			window.close();
+	 	}
 
-	const sf::Texture& texture = renderTexture.getTexture();
-	sf::Sprite sprite(texture);
-
-	while(window.isOpen()){
-		while(const std::optional event = window.pollEvent()){
-			if(event->is<sf::Event::Closed>())
-				window.close();
-		}
-		window.clear();
-		window.draw(sprite);
-		window.display();
+ 	window.clear();
+ 	window.draw( rectangle );
+ 	window.display();
 	}
-
 }
