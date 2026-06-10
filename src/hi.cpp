@@ -3,10 +3,15 @@
 int main()
 {
 	sf ::RenderWindow window(sf::VideoMode({800, 600}), "Window");
-	sf:: CircleShape circle(200.f);
-	circle.setRadius(40.f);
-	circle.setPointCount(3); //using a circle command and changing no. of sides to obtain necessary shape
-	circle.setFillColor(sf::Color::Cyan);
+	sf ::ConvexShape convex;
+
+	convex.setPointCount(5);
+	convex.setPoint(0, {50.f, 50.f});
+	convex.setPoint(1, {200.f, 60.f});
+	convex.setPoint(2, {170.f, 140.f});
+	convex.setPoint(3, {80.f, 150.f});
+	convex.setPoint(4, {50.f, 100.f});
+	convex.setFillColor(sf::Color(100, 12, 100));
 
 	while(window.isOpen())
 	{
@@ -17,7 +22,7 @@ int main()
 	 	}
 
  	window.clear();
- 	window.draw(circle);
+ 	window.draw(convex);
  	window.display();
 	}
 }
