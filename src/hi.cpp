@@ -1,22 +1,27 @@
 #include <SFML/Graphics.hpp>
+using namespace std;
+using namespace sf;
 
 int main()
 {
-	sf ::RenderWindow window(sf::VideoMode({800, 600}), "Window");
-	sf::RectangleShape line({150.f, 5.f});
-
-	line.rotate(sf:: degrees(45));
+	RenderWindow window(VideoMode({800, 600}), "Window");
+	array line = 
+	{
+		Vertex{Vector2f(10.f, 10.f)},
+		Vertex{Vector2f(790.f, 590.f)}
+	};
+	
 
 	while(window.isOpen())
 	{
-		while ( const std::optional event = window.pollEvent() )
+		while ( const optional event = window.pollEvent() )
 	 	{
-	 		if ( event->is<sf::Event::Closed>() )
+	 		if ( event->is<Event::Closed>() )
 	 			window.close();
 	 	}
 
  	window.clear();
- 	window.draw(line);
+ 	window.draw(line.data(), line.size(), PrimitiveType::Lines);
  	window.display();
 	}
 }
