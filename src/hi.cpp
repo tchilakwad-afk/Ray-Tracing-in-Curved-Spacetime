@@ -7,7 +7,7 @@ using namespace sf;
 
 double c = 299792458.0;
 double G = 6.67430e-11;
-double scale = 1e6;
+double scale = 1e8;
 double c_pixels = c / scale;
 
 struct BlackHole{
@@ -22,7 +22,7 @@ struct BlackHole{
 	void draw(RenderWindow& window){
 		CircleShape circle(r_s / scale);
 		circle.setFillColor(Color::Red);
-		circle.setPosition(position);
+		circle.setPosition(position - Vector2f(r_s/scale, r_s/scale));
 		
 		window.draw(circle);
 	}
@@ -67,7 +67,7 @@ int main()
 
 	while(window.isOpen())
 	{
-		float dt = clock.restart().asSeconds();
+		float dt = clock.restart().asSeconds()*100.f;
 		while ( const optional event = window.pollEvent() )
 	 	{
 	 		if ( event->is<Event::Closed>() )
