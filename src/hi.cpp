@@ -4,6 +4,7 @@
 using namespace std;
 using namespace sf;
 #define PI 3.14159265358979323846
+//λ
 
 double c = 299792458.0;
 double G = 6.67430e-11;
@@ -38,23 +39,33 @@ struct Ray{
 	double dr; double dphi;
 	double d2r; double d2phi;
 
-	Ray(Vector2f pos, Vector2f vel, BlackHole SagA): position(pos), velocity(vel), active(true){
-		this->r = sqrt(position.x*position.x + position.y*position.y);
-		this->phi = atan2(position.y, position.x);
+	Ray(Vector2f pos, Vector2f vel): position(pos), velocity(vel), active(true){
+		this->r = sqrt((position.x-600.f)*(position.x-600.f) + (position.y-300.f)*(position.y-300.f))*scale;
+		this->phi = atan2(position.y-300.f, position.x-600.f);
 
-		dr = cos(phi)*velocity.x + sin(phi)*velocity.y;
-		dphi = (cos(phi)*velocity.y - sin(phi)*velocity.x)/r;
+		dr = (cos(phi)*velocity.x + sin(phi)*velocity.y)*scale;
+		dphi = (cos(phi)*velocity.y - sin(phi)*velocity.x)*scale/r;
+	}
+
+	void update(float dt, BlackHole SagA){
+		if(!active) return;
 
 		d2r = (SagA.r_s*dr*dr)/(2*r*(r - SagA.r_s)) + (r - SagA.r_s)*dphi*dphi;
 		d2phi = -2.0*dr*dphi/r;
-	}
 
-	void update(float dt){
-		if(!active) return;
-		position += velocity * dt;
+		dr += d2r*dt;
+		dphi += d2phi*dt;
+		r += dr*dt;
+		phi += dphi*dt;
+
+		position.x = r*cos(phi) / scale + 600.f;
+		position.y = r*sin(phi) / scale + 300.f;
+
 		trail.push_back(Vertex(position, Color(225, 255, 0)));
 
 		if(position.x < 0 || position.x > 800 || position.y < 0 || position.y > 600)
+			active = false;
+		if(r < SagA.r_s)
 			active = false;
 	}
 
@@ -73,7 +84,7 @@ int main()
 	for(int i = 0; i <= 10; i++){
 		Vector2f startPos(0.f, 50.f + i * 50.f);
 		Vector2f vel(c_pixels, 0.f);
-		rays.push_back(Ray(startPos, vel, SagA));
+		rays.push_back(Ray(startPos, vel));
 	}
 
 	Clock clock;
@@ -88,7 +99,7 @@ int main()
 	 	}
 		
 		for(auto& ray : rays)
-			ray.update(dt);
+			ray.update(dt, SagA);
 
  		window.clear();
 
