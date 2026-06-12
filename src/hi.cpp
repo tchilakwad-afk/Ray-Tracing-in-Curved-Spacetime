@@ -34,7 +34,20 @@ struct Ray{
 	vector<Vertex> trail;
 	bool active;
 
-	Ray(Vector2f pos, Vector2f vel): position(pos), velocity(vel), active(true){}
+	double r; double phi;
+	double dr; double dphi;
+	double d2r; double d2phi;
+
+	Ray(Vector2f pos, Vector2f vel, BlackHole SagA): position(pos), velocity(vel), active(true){
+		this->r = sqrt(position.x*position.x + position.y*position.y);
+		this->phi = atan2(position.y, position.x);
+
+		dr = cos(phi)*velocity.x + sin(phi)*velocity.y;
+		dphi = (cos(phi)*velocity.y - sin(phi)*velocity.x)/r;
+
+		d2r = (SagA.r_s*dr*dr)/(2*r*(r - SagA.r_s)) + (r - SagA.r_s)*dphi*dphi;
+		d2phi = -2.0*dr*dphi/r;
+	}
 
 	void update(float dt){
 		if(!active) return;
@@ -60,7 +73,7 @@ int main()
 	for(int i = 0; i <= 10; i++){
 		Vector2f startPos(0.f, 50.f + i * 50.f);
 		Vector2f vel(c_pixels, 0.f);
-		rays.push_back(Ray(startPos, vel));
+		rays.push_back(Ray(startPos, vel, SagA));
 	}
 
 	Clock clock;
