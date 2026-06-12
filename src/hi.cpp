@@ -54,7 +54,7 @@ struct Ray{
 int main()
 {
 	RenderWindow window(VideoMode({800, 600}), "Window");
-	BlackHole SagA(Vector2f(400.f, 300.f), 8.54e36);
+	BlackHole SagA(Vector2f(600.f, 300.f), 8.54e36);
 
 	vector<Ray> rays;
 	for(int i = 0; i <= 10; i++){
