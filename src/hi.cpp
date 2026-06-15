@@ -33,7 +33,8 @@ struct BlackHole{
 struct Ray{
 	Vector2f position;
 	Vector2f velocity;
-	vector<Vertex> trail;
+	vector<pair<Vertex, float>> trail;
+	float currentTime = 0.0f;
 	bool active;
 
 	double r; double phi;
@@ -69,7 +70,17 @@ struct Ray{
 		position.x = r*cos(phi) / scale + 600.f;
 		position.y = r*sin(phi) / scale + 300.f;
 
-		trail.push_back(Vertex(position, Color(225, 255, 0)));
+		currentTime += dlambda;
+		trail.push_back({Vertex(position, Color(225, 255, 0)), currentTime});
+
+		float trailDuration = 250.0f;
+		trail.erase(
+			remove_if(trail.begin(), trail.end(),
+			[&](const pair<Vertex, float>&v){
+				return currentTime - v.second > trailDuration;
+			}),
+			trail.end()
+		);
 
 		if(position.x < 0 || position.x > 800 || position.y < 0 || position.y > 600)
 			active = false;
@@ -78,8 +89,23 @@ struct Ray{
 	}
 
 	void draw(RenderWindow& window){
-		if(trail.size() >= 2)
-			window.draw(trail.data(), trail.size(), PrimitiveType::LineStrip);
+		// if(trail.size() >= 2)
+		// 	window.draw(trail.data(), trail.size(), PrimitiveType::LineStrip);
+
+		if(trail.size() < 2) return;
+
+		float trailDuration = 250.0f;
+		vector<Vertex> fadedTrail;
+
+		for(auto&[vertex, timestamp] : trail){
+			float age = currentTime - timestamp;
+			float alpha = 1.0f - (age/trailDuration);
+			Vertex v = vertex;
+			v.color = Color(255, 255, 0, (unsigned int)(alpha * 255));
+			fadedTrail.push_back(v);
+		}
+
+		window.draw(fadedTrail.data(), fadedTrail.size(), PrimitiveType::LineStrip);
 	}
 };
 
