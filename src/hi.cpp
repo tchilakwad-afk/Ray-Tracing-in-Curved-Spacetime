@@ -1,10 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include<vector>
 #include<cmath>
+
 using namespace std;
 using namespace sf;
+
 #define PI 3.14159265358979323846
-//λ
 
 double c = 299792458.0;
 double G = 6.67430e-11;
@@ -38,32 +39,32 @@ struct Ray{
 	double r; double phi;
 	double dr; double dphi;
 	double d2r; double d2phi;
-	//double t; double dt_dλ;
+	double t; double dt;
 
-	Ray(Vector2f pos, Vector2f vel): position(pos), velocity(vel), active(true){
+	Ray(Vector2f pos, Vector2f vel, BlackHole SagA): position(pos), velocity(vel), active(true){
 		this->r = sqrt((position.x-600.f)*(position.x-600.f) + (position.y-300.f)*(position.y-300.f))*scale;
 		this->phi = atan2(position.y-300.f, position.x-600.f);
 
 		dr = (cos(phi)*velocity.x + sin(phi)*velocity.y)*scale;
 		dphi = (cos(phi)*velocity.y - sin(phi)*velocity.x)*scale/r;
 
-		// t = 0.0;
-		// dt_dλ = sqrt((dr*dr/(1-SagA.r_s/r) + r*r*dphi*dphi)/(1-SagA.r_s/r))/c;
+		t = 0.0;
+		dt = sqrt((dr*dr/(1-SagA.r_s/r) + r*r*dphi*dphi)/(1-SagA.r_s/r))/c;
 	}
 
-	void update(float dλ, BlackHole SagA){
+	void update(float dlambda, BlackHole SagA){
 		if(!active) return;
 
 		d2r = (SagA.r_s*dr*dr)/(2*r*(r - SagA.r_s)) + (r - SagA.r_s)*dphi*dphi;
 		d2phi = -2.0*dr*dphi/r;
 
-		dr += d2r*dλ;
-		dphi += d2phi*dλ;
-		r += dr*dλ;
-		phi += dphi*dλ;
+		dr += d2r*dlambda;
+		dphi += d2phi*dlambda;
+		r += dr*dlambda;
+		phi += dphi*dlambda;
 
-		// dt_dλ = sqrt((dr*dr/(1-SagA.r_s/r) + r*r*dphi*dphi)/(1-SagA.r_s/r))*scale;
-		// t += dt_dλ*dt;
+		dt = sqrt((dr*dr/(1-SagA.r_s/r) + r*r*dphi*dphi)/(1-SagA.r_s/r))*scale;
+		t += dt*dlambda;
 
 		position.x = r*cos(phi) / scale + 600.f;
 		position.y = r*sin(phi) / scale + 300.f;
@@ -91,14 +92,14 @@ int main()
 	for(int i = 0; i <= 10; i++){
 		Vector2f startPos(0.f, 50.f + i * 50.f);
 		Vector2f vel(c_pixels, 0.f);
-		rays.push_back(Ray(startPos, vel));
+		rays.push_back(Ray(startPos, vel, SagA));
 	}
 
 	Clock clock;
 
 	while(window.isOpen())
 	{
-		float dλ = clock.restart().asSeconds()*100.f;
+		float dlambda = clock.restart().asSeconds()*100.f;
 		while ( const optional event = window.pollEvent() )
 	 	{
 	 		if ( event->is<Event::Closed>() )
@@ -106,7 +107,7 @@ int main()
 	 	}
 		
 		for(auto& ray : rays)
-			ray.update(dλ, SagA);
+			ray.update(dlambda, SagA);
 
  		window.clear();
 
