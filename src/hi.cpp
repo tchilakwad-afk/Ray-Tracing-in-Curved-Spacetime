@@ -38,6 +38,7 @@ struct Ray{
 	double r; double phi;
 	double dr; double dphi;
 	double d2r; double d2phi;
+	//double t; double dt_dλ;
 
 	Ray(Vector2f pos, Vector2f vel): position(pos), velocity(vel), active(true){
 		this->r = sqrt((position.x-600.f)*(position.x-600.f) + (position.y-300.f)*(position.y-300.f))*scale;
@@ -45,18 +46,24 @@ struct Ray{
 
 		dr = (cos(phi)*velocity.x + sin(phi)*velocity.y)*scale;
 		dphi = (cos(phi)*velocity.y - sin(phi)*velocity.x)*scale/r;
+
+		// t = 0.0;
+		// dt_dλ = sqrt((dr*dr/(1-SagA.r_s/r) + r*r*dphi*dphi)/(1-SagA.r_s/r))/c;
 	}
 
-	void update(float dt, BlackHole SagA){
+	void update(float dλ, BlackHole SagA){
 		if(!active) return;
 
 		d2r = (SagA.r_s*dr*dr)/(2*r*(r - SagA.r_s)) + (r - SagA.r_s)*dphi*dphi;
 		d2phi = -2.0*dr*dphi/r;
 
-		dr += d2r*dt;
-		dphi += d2phi*dt;
-		r += dr*dt;
-		phi += dphi*dt;
+		dr += d2r*dλ;
+		dphi += d2phi*dλ;
+		r += dr*dλ;
+		phi += dphi*dλ;
+
+		// dt_dλ = sqrt((dr*dr/(1-SagA.r_s/r) + r*r*dphi*dphi)/(1-SagA.r_s/r))*scale;
+		// t += dt_dλ*dt;
 
 		position.x = r*cos(phi) / scale + 600.f;
 		position.y = r*sin(phi) / scale + 300.f;
@@ -91,7 +98,7 @@ int main()
 
 	while(window.isOpen())
 	{
-		float dt = clock.restart().asSeconds()*100.f;
+		float dλ = clock.restart().asSeconds()*100.f;
 		while ( const optional event = window.pollEvent() )
 	 	{
 	 		if ( event->is<Event::Closed>() )
@@ -99,7 +106,7 @@ int main()
 	 	}
 		
 		for(auto& ray : rays)
-			ray.update(dt, SagA);
+			ray.update(dλ, SagA);
 
  		window.clear();
 
