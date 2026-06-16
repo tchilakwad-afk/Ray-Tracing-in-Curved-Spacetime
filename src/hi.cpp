@@ -12,6 +12,10 @@ double G = 6.67430e-11;
 double scale = 1e8;
 double c_pixels = c / scale;
 
+struct Ray;
+struct BlackHole;
+void geodesic(double& d2t, double& d2r, double& d2phi, Ray ray, BlackHole SagA);
+
 struct BlackHole{
 	Vector2f position;
 	double mass;
@@ -37,10 +41,9 @@ struct Ray{
 	float currentTime = 0.0f;
 	bool active;
 
-	double r; double phi;
-	double dr; double dphi;
-	double d2r; double d2phi;
-	double t; double dt;
+	double r; double phi; double t;
+	double dr; double dphi; double dt;
+	double d2r; double d2phi; double d2t;
 
 	Ray(Vector2f pos, Vector2f vel, BlackHole SagA): position(pos), velocity(vel), active(true){
 		this->r = sqrt((position.x-600.f)*(position.x-600.f) + (position.y-300.f)*(position.y-300.f))*scale;
@@ -56,16 +59,26 @@ struct Ray{
 	void update(float dlambda, BlackHole SagA){
 		if(!active) return;
 
-		d2r = (SagA.r_s*dr*dr)/(2*r*(r - SagA.r_s)) + (r - SagA.r_s)*dphi*dphi;
-		d2phi = -2.0*dr*dphi/r;
+		// d2r = (SagA.r_s*dr*dr)/(2*r*(r - SagA.r_s)) + (r - SagA.r_s)*dphi*dphi;
+		// d2phi = -2.0*dr*dphi/r;
 
+		// dr += d2r*dlambda;
+		// dphi += d2phi*dlambda;
+		// r += dr*dlambda;
+		// phi += dphi*dlambda;
+
+		// dt = sqrt((dr*dr/(1-SagA.r_s/r) + r*r*dphi*dphi)/(1-SagA.r_s/r))*scale;
+		// t += dt*dlambda;
+
+		geodesic(d2t, d2r, d2phi, *this, SagA);
+
+		dt += d2t*dlambda;
 		dr += d2r*dlambda;
 		dphi += d2phi*dlambda;
+
+		t += dt*dlambda;
 		r += dr*dlambda;
 		phi += dphi*dlambda;
-
-		dt = sqrt((dr*dr/(1-SagA.r_s/r) + r*r*dphi*dphi)/(1-SagA.r_s/r))*scale;
-		t += dt*dlambda;
 
 		position.x = r*cos(phi) / scale + 600.f;
 		position.y = r*sin(phi) / scale + 300.f;
@@ -108,6 +121,22 @@ struct Ray{
 		window.draw(fadedTrail.data(), fadedTrail.size(), PrimitiveType::LineStrip);
 	}
 };
+
+void geodesic(double& d2t, double& d2r, double& d2phi, Ray ray, BlackHole SagA){
+	double cs_t[2]; double cs_r[3]; double cs_phi[2];
+	
+	cs_t[0] = cs_t[1] = SagA.r_s / (2*ray.r*(ray.r - SagA.r_s));
+
+	cs_r[0] = (SagA.r_s*(ray.r - SagA.r_s))/(2*ray.r*ray.r*ray.r);
+	cs_r[1] = (SagA.r_s)/(2*ray.r*(SagA.r_s - ray.r));
+	cs_r[2] = SagA.r_s - ray.r;
+
+	cs_phi[0] = cs_phi[1] = 1 / ray.r;
+
+	d2t = (-2)*cs_t[0]*ray.dt*ray.dr;
+	d2r = (-1)*(cs_r[0]*ray.dt*ray.dt + cs_r[1]*ray.dr*ray.dr + cs_r[2]*ray.dphi*ray.dphi);
+	d2phi = (-2)*cs_phi[0]*ray.dr*ray.dphi;
+}
 
 int main()
 {
