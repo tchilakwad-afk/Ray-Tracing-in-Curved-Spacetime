@@ -15,6 +15,7 @@ double c_pixels = c / scale;
 struct Ray;
 struct BlackHole;
 void geodesic(double& d2t, double& d2r, double& d2phi, Ray ray, BlackHole SagA);
+void runge_kutta4(double dlambda, Ray& ray, BlackHole SagA);
 
 struct BlackHole{
 	Vector2f position;
@@ -43,7 +44,7 @@ struct Ray{
 
 	double r; double phi; double t;
 	double dr; double dphi; double dt;
-	double d2r; double d2phi; double d2t;
+	// double d2r; double d2phi; double d2t;
 
 	Ray(Vector2f pos, Vector2f vel, BlackHole SagA): position(pos), velocity(vel), active(true){
 		this->r = sqrt((position.x-600.f)*(position.x-600.f) + (position.y-300.f)*(position.y-300.f))*scale;
@@ -58,15 +59,17 @@ struct Ray{
 	void update(float dlambda, BlackHole SagA){
 		if(!active) return;
 
-		geodesic(d2t, d2r, d2phi, *this, SagA);
+		// geodesic(d2t, d2r, d2phi, *this, SagA);
 
-		dt += d2t*dlambda;
-		dr += d2r*dlambda;
-		dphi += d2phi*dlambda;
+		// dt += d2t*dlambda;
+		// dr += d2r*dlambda;
+		// dphi += d2phi*dlambda;
 
-		t += dt*dlambda;
-		r += dr*dlambda;
-		phi += dphi*dlambda;
+		// t += dt*dlambda;
+		// r += dr*dlambda;
+		// phi += dphi*dlambda;
+
+		runge_kutta4(dlambda, *this, SagA);
 
 		position.x = r*cos(phi) / scale + 600.f;
 		position.y = r*sin(phi) / scale + 300.f;
@@ -99,6 +102,44 @@ void geodesic(double& d2t, double& d2r, double& d2phi, Ray ray, BlackHole SagA){
 	d2t = (-2)*cs_t[0]*ray.dt*ray.dr;
 	d2r = (-1)*(cs_r[0]*ray.dt*ray.dt + cs_r[1]*ray.dr*ray.dr + cs_r[2]*ray.dphi*ray.dphi);
 	d2phi = (-2)*cs_phi[0]*ray.dr*ray.dphi;
+}
+
+void runge_kutta4(double dlambda, Ray& ray, BlackHole SagA){
+	double rk_t[4]; double rk_r[4]; double rk_phi[4];
+	geodesic(rk_t[0], rk_r[0], rk_phi[0], ray, SagA);
+
+	Ray temp = ray;
+	temp.dt += rk_t[0] * dlambda/2;
+	temp.dr += rk_r[0] * dlambda/2;
+	temp.dphi += rk_phi[0] * dlambda/2;
+	temp.t += ray.dt * dlambda/2;
+	temp.r += ray.t * dlambda/2;
+	temp.phi += ray.phi * dlambda/2;
+	geodesic(rk_t[1], rk_r[1], rk_phi[1], temp, SagA);
+
+	temp.dt += rk_t[1] * dlambda/2;
+	temp.dr += rk_r[1] * dlambda/2;
+	temp.dphi += rk_phi[1] * dlambda/2;
+	temp.t += ray.dt * dlambda/2;
+	temp.r += ray.t * dlambda/2;
+	temp.phi += ray.phi * dlambda/2;
+	geodesic(rk_r[2], rk_r[2], rk_phi[2], temp, SagA);
+
+	temp.dt += rk_t[2] * dlambda;
+	temp.dr += rk_r[2] * dlambda;
+	temp.dphi += rk_phi[2] * dlambda;
+	temp.t += ray.dt * dlambda;
+	temp.r += ray.t * dlambda;
+	temp.phi += ray.phi * dlambda;
+	geodesic(rk_r[3], rk_r[3], rk_phi[3], temp, SagA);
+
+	ray.dt += (dlambda/6) * (rk_t[0] + 2*rk_t[1] + 2*rk_t[2] + rk_t[3]);
+	ray.dr += (dlambda/6) * (rk_r[0] + 2*rk_r[1] + 2*rk_r[2] + rk_r[3]);
+	ray.dphi += (dlambda/6) * (rk_phi[0] + 2*rk_phi[1] + 2*rk_phi[2] + rk_phi[3]);
+
+	ray.t += ray.dt * dlambda;
+	ray.r += ray.dr * dlambda;
+	ray.phi += ray.dphi * dlambda;
 }
 
 int main()
