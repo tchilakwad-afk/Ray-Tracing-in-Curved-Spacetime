@@ -47,8 +47,8 @@ struct Ray{
 	// double d2r; double d2phi; double d2t;
 
 	Ray(Vector2f pos, Vector2f vel, BlackHole SagA): position(pos), velocity(vel), active(true){
-		this->r = sqrt((position.x-600.f)*(position.x-600.f) + (position.y-300.f)*(position.y-300.f))*scale;
-		this->phi = atan2(position.y-300.f, position.x-600.f);
+		this->r = sqrt((position.x-400.f)*(position.x-400.f) + (position.y-300.f)*(position.y-300.f))*scale;
+		this->phi = atan2(position.y-300.f, position.x-400.f);
 		t = 0.0;
 
 		dr = (cos(phi)*velocity.x + sin(phi)*velocity.y)*scale;
@@ -71,7 +71,7 @@ struct Ray{
 
 		runge_kutta4(dlambda, *this, SagA);
 
-		position.x = r*cos(phi) / scale + 600.f;
+		position.x = r*cos(phi) / scale + 400.f;
 		position.y = r*sin(phi) / scale + 300.f;
 
 		trail.push_back(Vertex(position, Color(225, 255, 0)));
@@ -145,7 +145,7 @@ void runge_kutta4(double dlambda, Ray& ray, BlackHole SagA){
 int main()
 {
 	RenderWindow window(VideoMode({800, 600}), "Window");
-	BlackHole SagA(Vector2f(600.f, 300.f), 8.54e36);
+	BlackHole SagA(Vector2f(400.f, 300.f), 8.54e36);
 
 	vector<Ray> rays;
 	for(int i = 0; i <= 10; i++){
