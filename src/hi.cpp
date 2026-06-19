@@ -113,24 +113,24 @@ void runge_kutta4(double dlambda, Ray& ray, BlackHole SagA){
 	temp.dr += rk_r[0] * dlambda/2;
 	temp.dphi += rk_phi[0] * dlambda/2;
 	temp.t += ray.dt * dlambda/2;
-	temp.r += ray.t * dlambda/2;
-	temp.phi += ray.phi * dlambda/2;
+	temp.r += ray.dr * dlambda/2;
+	temp.phi += ray.dphi * dlambda/2;
 	geodesic(rk_t[1], rk_r[1], rk_phi[1], temp, SagA);
 
 	temp.dt += rk_t[1] * dlambda/2;
 	temp.dr += rk_r[1] * dlambda/2;
 	temp.dphi += rk_phi[1] * dlambda/2;
 	temp.t += ray.dt * dlambda/2;
-	temp.r += ray.t * dlambda/2;
-	temp.phi += ray.phi * dlambda/2;
+	temp.r += ray.dr * dlambda/2;
+	temp.phi += ray.dphi * dlambda/2;
 	geodesic(rk_r[2], rk_r[2], rk_phi[2], temp, SagA);
 
 	temp.dt += rk_t[2] * dlambda;
 	temp.dr += rk_r[2] * dlambda;
 	temp.dphi += rk_phi[2] * dlambda;
 	temp.t += ray.dt * dlambda;
-	temp.r += ray.t * dlambda;
-	temp.phi += ray.phi * dlambda;
+	temp.r += ray.dr * dlambda;
+	temp.phi += ray.dphi * dlambda;
 	geodesic(rk_r[3], rk_r[3], rk_phi[3], temp, SagA);
 
 	ray.dt += (dlambda/6) * (rk_t[0] + 2*rk_t[1] + 2*rk_t[2] + rk_t[3]);
