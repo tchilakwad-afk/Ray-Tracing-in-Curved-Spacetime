@@ -15,7 +15,7 @@ FetchContent_MakeAvailable(SFML)
 find_package(OpenCL REQUIRED)
 
 add_executable(main
-    src/scratch.cpp
+    src/2D_lensing.cpp
 )
 target_compile_definitions(main PRIVATE
     PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
