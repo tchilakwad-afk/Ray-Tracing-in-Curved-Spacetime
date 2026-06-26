@@ -1,16 +1,18 @@
-#include <SFML/Graphics.hpp>
-#include<vector>
-#include<cmath>
+#include "2D_lensing.hpp"
 
-using namespace std;
-using namespace sf;
+// #include <SFML/Graphics.hpp>
+// #include<vector>
+// #include<cmath>
 
-#define PI 3.14159265358979323846
+// using namespace std;
+// using namespace sf;
 
-double c = 299792458.0;
-double G = 6.67430e-11;
-double scale = 1e8;
-double c_pixels = c / scale;
+// #define PI 3.14159265358979323846
+
+// double c = 299792458.0;
+// double G = 6.67430e-11;
+// double scale = 1e8;
+// double c_pixels = c / scale;
 
 struct Ray;
 struct BlackHole;
