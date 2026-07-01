@@ -20,3 +20,4 @@ std::string PROGRAM_FILE = PROJECT_SOURCE_DIR + std::string("/kernels/program.cl
 #define WORK_SIZE 32
 #define INPUT_RANGE 100.0f
 
+using namespace std;

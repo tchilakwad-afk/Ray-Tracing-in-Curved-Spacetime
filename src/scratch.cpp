@@ -28,7 +28,7 @@ int main()
     err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &dev, &no_of_devs);
     if (err == CL_DEVICE_NOT_FOUND)
     {
-        std::cout << "Unable to find gpu device. Trying for cpu\n";
+        cout << "Unable to find gpu device. Trying for cpu\n";
         err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &dev, &no_of_devs);
     }
     if (err < 0)
@@ -54,7 +54,7 @@ int main()
     program_handle = fopen(PROGRAM_FILE.c_str(), "r");
     if (program_handle == NULL)
     {
-        std::cout<<"ERROR::UNABLE TO OPEN FILE::"<<PROGRAM_FILE<<std::endl;
+        cout<<"ERROR::UNABLE TO OPEN FILE::"<<PROGRAM_FILE<<endl;
         exit(1);
     }
 
@@ -159,9 +159,9 @@ int main()
         }
     }
     if(same){
-        std::cout<<"Check passed. Sums are the same.\n";
+        cout<<"Check passed. Sums are the same.\n";
     }else{
-        std::cout<<"Check failed. Different values.\n";
+        cout<<"Check failed. Different values.\n";
     }
 
 
