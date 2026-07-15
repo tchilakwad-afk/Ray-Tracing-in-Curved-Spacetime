@@ -30,7 +30,7 @@ find_package(OpenCL REQUIRED)
 #---------------------------------------------------------------
 
 add_executable(main
-    src/scratch.cpp
+    src/2D_lensing.cpp
 )
 
 target_compile_definitions(main PRIVATE
